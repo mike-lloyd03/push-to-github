@@ -1,0 +1,16 @@
+#!/bin/bash
+
+pwd=$(cd "$(dirname "$0")" && pwd)
+repo_paths="$(cat $pwd/github_repos)"
+log_file="$pwd/push-to-github.log"
+
+for path in $repo_paths; do
+    if [ ! -d "$path" ]; then
+        echo >&2 "Repo $path does not exist"
+        continue
+    fi
+    cd $path
+    echo "cd $path" >>$log_file
+    git commit -am "Nightly commit $(date +%Y-%m-%d)" &>>$log_file || continue
+    git push origin master
+done
